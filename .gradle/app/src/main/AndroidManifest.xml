@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.bob.musicaudio" >
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <application
+        android:name=".app.MusicApp"
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" >
+        <activity
+            android:name=".activity.MainContentActivity"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <service android:name=".service.MediaService" >
+            <intent-filter>
+                <action android:name="com.bob.musicaudio.service.MediaService" />
+            </intent-filter>
+        </service>
+
+        <activity
+            android:name=".activity.MenuBackgroundActivity"
+            android:label="@string/title_activity_menu_background" >
+        </activity>
+        <activity
+            android:name=".activity.MenuScanActivity"
+            android:label="@string/title_activity_menu_scan" >
+        </activity>
+        <activity
+            android:name=".activity.AboutActivity"
+            android:label="@string/title_activity_about" >
+        </activity>
+        <activity
+            android:name=".activity.MenuSettingActivity"
+            android:label="@string/title_activity_menu_setting" >
+        </activity>
+
+    </application>
+
+</manifest>
