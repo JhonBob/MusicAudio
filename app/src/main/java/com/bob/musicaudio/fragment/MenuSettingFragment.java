@@ -18,6 +18,8 @@ import com.bob.musicaudio.unitls.SPStorage;
 /**
  * Created by Administrator on 2015/8/1.
  */
+
+//侧滑菜单-----设置
 public class MenuSettingFragment extends Fragment implements OnClickListener, IConstants {
 
     private LinearLayout mAdviceLayout, mAboutLayout;

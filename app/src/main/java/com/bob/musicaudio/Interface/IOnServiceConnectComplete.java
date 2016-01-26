@@ -7,5 +7,5 @@ import com.bob.musicaudio.service.IMediaService;
  */
 public interface IOnServiceConnectComplete {
 
-    public void onServiceConnectComplete(IMediaService service);
+     void onServiceConnectComplete(IMediaService service);
 }

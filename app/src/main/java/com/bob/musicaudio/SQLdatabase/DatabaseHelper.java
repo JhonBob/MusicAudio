@@ -9,25 +9,34 @@ import android.database.sqlite.SQLiteDatabase.CursorFactory;
 /**
  * Created by Administrator on 2015/7/12.
  */
+
+//功能：数据库帮助类----管理数据库
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static SQLiteDatabase mDb;
     private static DatabaseHelper mHelper;
+    //数据库版本
     private static final int DB_VERSION = 3;
+    //数据库名
     private static final String DB_NAME = "musicstore_new";
+    //专辑表
     private static final String TABLE_ALBUM = "album_info";
+    //艺术家表
     private static final String TABLE_ARTIST = "artist_info";
+    //所有音乐表
     private static final String TABLE_MUSIC = "music_info";
+    //文件夹表
     private static final String TABLE_FOLDER = "folder_info";
+    //最喜欢的音乐表
     private static final String TABLE_FAVORITE = "favorite_info";
-
+    //单例模式数据库实例
     public static SQLiteDatabase getInstance(Context context) {
         if (mDb == null) {
             mDb = getHelper(context).getWritableDatabase();
         }
         return mDb;
     }
-
+    //单例模式数据库帮助类实例
     public static DatabaseHelper getHelper(Context context) {
         if(mHelper == null) {
             mHelper = new DatabaseHelper(context);
@@ -35,6 +44,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return mHelper;
     }
 
+    //初始化
     public DatabaseHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
     }
@@ -79,6 +89,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    //删除所有表
     public void deleteTables(Context context) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_ALBUM, null, null);

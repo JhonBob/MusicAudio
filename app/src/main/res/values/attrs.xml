@@ -25,7 +25,4 @@
         <attr name="selectorEnabled" format="boolean" />
         <attr name="selectorDrawable" format="reference" />
     </declare-styleable>
-    <declare-styleable name="FlingGalleryView">
-        <attr name="defaultScreen" format="integer" />
-    </declare-styleable>
 </resources>

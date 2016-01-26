@@ -41,6 +41,7 @@ public class MusicInfoDao implements IConstants {
         }
     }
 
+    //数据库有数据时调用
     public List<MusicInfo> getMusicInfo() {
         SQLiteDatabase db = DatabaseHelper.getInstance(mContext);
         String sql = "select * from " + TABLE_MUSIC;
@@ -69,6 +70,8 @@ public class MusicInfoDao implements IConstants {
         return list;
     }
 
+
+    //按类型查询
     public List<MusicInfo> getMusicInfoByType(String selection, int type) {
         SQLiteDatabase db = DatabaseHelper.getInstance(mContext);
         String sql = "";
@@ -82,16 +85,15 @@ public class MusicInfoDao implements IConstants {
         return parseCursor(db.rawQuery(sql, new String[]{ selection }));
     }
 
+
+    //修改最喜欢的歌曲数据库
     public void setFavoriteStateById(int id, int favorite) {
         SQLiteDatabase db = DatabaseHelper.getInstance(mContext);
         String sql = "update " + TABLE_MUSIC + " set favorite = " + favorite + " where _id = " + id;
         db.execSQL(sql);
     }
 
-    /**
-     * 数据库中是否有数据
-     * @return
-     */
+   //数据库中是否有数据
     public boolean hasData() {
         SQLiteDatabase db = DatabaseHelper.getInstance(mContext);
         String sql = "select count(*) from " + TABLE_MUSIC;

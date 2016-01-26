@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import com.bob.musicaudio.Interface.IConstants;
 import com.bob.musicaudio.R;
+import com.bob.musicaudio.activity.MainActivity;
 import com.bob.musicaudio.model.MusicInfo;
 import com.bob.musicaudio.service.ServiceManager;
 import com.bob.musicaudio.unitls.AlwaysMarqueeTextView;
@@ -36,12 +37,12 @@ public class MyMusicUIManager implements OnClickListener, IConstants {
     private TextView mPositionTv, mDurationTv;
     private ImageButton mPlayBtn, mPauseBtn, mNextBtn, mMenuBtn;
     private ProgressBar mPlaybackProgress;
-    public Handler mHandler;
     private Bitmap mDefaultAlbumIcon;
-    private ImageView mHeadIcon,mAlbum,mAlbumReflection;
-
-    private ImageButton mSearchBtn, mBackBtn;
+    private ImageView mHeadIcon;
+    public ImageButton  mBackBtn;
     private UIManager mUIManager;
+    public Handler mHandler;
+
 
     public MyMusicUIManager(Activity a, ServiceManager sm, View view, UIManager manager) {
         this.mActivity = a;
@@ -60,6 +61,7 @@ public class MyMusicUIManager implements OnClickListener, IConstants {
         };
     }
 
+    //初始化UI界面控件
     private void initView() {
         mBackBtn = (ImageButton) findViewById(R.id.backBtn);
         mMusicNameTv = (AlwaysMarqueeTextView) findViewById(R.id.musicname_tv2);
@@ -83,19 +85,11 @@ public class MyMusicUIManager implements OnClickListener, IConstants {
 
         mDefaultAlbumIcon = BitmapFactory.decodeResource(
                 mActivity.getResources(), R.drawable.img_album_background);
-		/*
-		 * mDefaultAlbumIcon = new BitmapDrawable(mActivity.getResources(), b);
-		 * // no filter or dither, it's a lot faster and we can't tell the //
-		 * difference mDefaultAlbumIcon.setFilterBitmap(false);
-		 * mDefaultAlbumIcon.setDither(false);
-		 */
-
         mHeadIcon = (ImageView) findViewById(R.id.headicon_iv);
-        mAlbum=(ImageView)findViewById(R.id.iv_music_ablum);
-        mAlbumReflection=(ImageView)findViewById(R.id.iv_music_ablum_reflection);
 
     }
 
+    //刷新进度条
     public void refreshSeekProgress(int curTime, int totalTime) {
 
         curTime /= 1000;
@@ -110,9 +104,12 @@ public class MyMusicUIManager implements OnClickListener, IConstants {
         if (totalTime != 0) {
             rate = (int) ((float) curTime / totalTime * 100);
         }
+
         mPlaybackProgress.setProgress(rate);
     }
 
+
+    //刷新UI
     public void refreshUI(int curTime, int totalTime, MusicInfo music) {
 
         int tempCurTime = curTime;
@@ -133,18 +130,11 @@ public class MyMusicUIManager implements OnClickListener, IConstants {
                 mDefaultAlbumIcon);
         mHeadIcon.setBackgroundDrawable(new BitmapDrawable(mActivity.getResources(), bitmap));
 
-        Bitmap mp=BitmapUtil.getArtwork(mActivity,music.songId,music.albumId,true,false);
-        if(mp!=null){
-            mAlbum.setImageBitmap(mp);
-            mAlbumReflection.setImageBitmap(ImageUtil.createReflectionBitmapForSingle(mp));
-        }else{
-            mp= BitmapUtil.getDefaultArtwork(mActivity,false);
-            mAlbum.setImageBitmap(mp);
-            mAlbumReflection.setImageBitmap(ImageUtil.createReflectionBitmapForSingle(mp));
-        }
         refreshSeekProgress(tempCurTime, tempTotalTime);
     }
 
+
+    //图标交替处理
     public void showPlay(boolean flag) {
         if (flag) {
             mPlayBtn.setVisibility(View.VISIBLE);
@@ -155,6 +145,7 @@ public class MyMusicUIManager implements OnClickListener, IConstants {
         }
     }
 
+    //封装简化
     public View findViewById(int id) {
         return mView.findViewById(id);
     }
@@ -175,9 +166,9 @@ public class MyMusicUIManager implements OnClickListener, IConstants {
                 mActivity.onBackPressed();
                 mUIManager.setCurrentItem();
                 break;
-            //case R.id.btn_menu2:
-               // ((MainContentActivity)mActivity).mSlidingMenu.showMenu(true);
-                //break;
+           case R.id.btn_menu2:
+              ((MainActivity)mActivity).mSlidingMenu.showMenu(true);
+               break;
         }
     }
 }

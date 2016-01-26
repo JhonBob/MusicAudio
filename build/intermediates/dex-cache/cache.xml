@@ -2,11 +2,46 @@
 <items version="2" >
 
     <item
-        jar="D:\mycodes\20150806\MusicAudio\app\build\intermediates\exploded-aar\com.android.support\design\23.0.1\jars\classes.jar"
+        jar="D:\mycodes\MusicAudio\app\build\intermediates\exploded-aar\com.android.support\support-v4\23.0.1\jars\classes.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="c31e21b53ff2f74664e498248d01453a32e32d48">
+        <dex dex="D:\mycodes\MusicAudio\app\build\intermediates\pre-dexed\debug\classes-5270ec3fdc4046b64f3ff3655c4e6789a3de9b2e.jar" />
+    </item>
+    <item
+        jar="D:\Sdk\extras\android\m2repository\com\android\support\support-annotations\23.0.1\support-annotations-23.0.1.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="1fce89a6428c51467090d7f424e4c9c3dbd55f7e">
+        <dex dex="D:\mycodes\MusicAudio\app\build\intermediates\pre-dexed\debug\support-annotations-23.0.1-a336b441fefa976bb85ff24ea4f289f1de6b1efa.jar" />
+    </item>
+    <item
+        jar="D:\mycodes\MusicAudio\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\23.0.1\jars\classes.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="d86429b0f0b3f3cafbeb78dda1b9d89119ccb05d">
+        <dex dex="D:\mycodes\MusicAudio\app\build\intermediates\pre-dexed\debug\classes-5903a3937051f8b32c08a010d5c9766c041e38d9.jar" />
+    </item>
+    <item
+        jar="D:\mycodes\MusicAudio\app\build\intermediates\exploded-aar\com.android.support\design\23.0.1\jars\classes.jar"
         jumboMode="false"
         revision="23.0.2"
         sha1="e5c61a3169221a89654ffcaaed47bba51cf071ad">
-        <dex dex="D:\mycodes\20150806\MusicAudio\app\build\intermediates\pre-dexed\debug\classes-ce7d7040a0136e09763e5d1e45d2da54485fe55f.jar" />
+        <dex dex="D:\mycodes\MusicAudio\app\build\intermediates\pre-dexed\debug\classes-38f20057ac14de68e802a64aad88f29daaacfcf9.jar" />
+    </item>
+    <item
+        jar="D:\mycodes\MusicAudio\app\libs\pinyin4j-2.5.0.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="ae353005f973da1cd8545b54354504c2503f6865">
+        <dex dex="D:\mycodes\MusicAudio\app\build\intermediates\pre-dexed\debug\pinyin4j-2.5.0-2754e1fe338a5703283c857fe16c4b4b20e8dec7.jar" />
+    </item>
+    <item
+        jar="D:\mycodes\MusicAudio\app\build\intermediates\exploded-aar\com.android.support\support-v4\23.0.1\jars\libs\internal_impl-23.0.1.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="aa92916125166649d8ad4ba3940c3dd7515596d3">
+        <dex dex="D:\mycodes\MusicAudio\app\build\intermediates\pre-dexed\debug\internal_impl-23.0.1-0f30f765b038bc707534d816405f88e7142617fc.jar" />
     </item>
 
 </items>

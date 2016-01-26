@@ -24,6 +24,8 @@ import java.util.List;
 /**
  * Created by Administrator on 2015/7/23.
  */
+
+//艺术家界面
 public class ArtistBrowserManager extends MainUIManager implements IConstants,AdapterView.OnItemClickListener
   ,View.OnClickListener{
     private Activity mActivity;
@@ -45,7 +47,6 @@ public class ArtistBrowserManager extends MainUIManager implements IConstants,Ad
 
     public View getView() {
         View view = mInflater.inflate(R.layout.artistbrower, null);
-        initBg(view);
         initView(view);
         return view;
     }
@@ -61,15 +62,6 @@ public class ArtistBrowserManager extends MainUIManager implements IConstants,Ad
         mListView.setOnItemClickListener(this);
     }
 
-    private void initBg(View view) {
-        mArtistLayout = (LinearLayout) view.findViewById(R.id.main_artist_layout);
-        SPStorage mSp = new SPStorage(mActivity);
-        String mDefaultBgPath = mSp.getPath();
-        Bitmap bitmap = mUIManager.getBitmapByPath(mDefaultBgPath);
-        if(bitmap != null) {
-            mArtistLayout.setBackgroundDrawable(new BitmapDrawable(mActivity.getResources(), bitmap));
-        }
-    }
 
     private class MyAdapter extends BaseAdapter {
 
@@ -131,13 +123,6 @@ public class ArtistBrowserManager extends MainUIManager implements IConstants,Ad
         mUIManager.setContentType(ARTIST_TO_MYMUSIC, mAdapter.getItem(position));
     }
 
-    @Override
-    protected void setBgByPath(String path) {
-        Bitmap bitmap = mUIManager.getBitmapByPath(path);
-        if(bitmap != null) {
-            mArtistLayout.setBackgroundDrawable(new BitmapDrawable(mActivity.getResources(), bitmap));
-        }
-    }
 
     @Override
     public View getView(int from) {

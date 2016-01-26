@@ -14,10 +14,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bob.musicaudio.R;
-import com.bob.musicaudio.activity.MainContentActivity;
+import com.bob.musicaudio.activity.MainActivity;
 import com.bob.musicaudio.model.MusicInfo;
 import com.bob.musicaudio.service.ServiceManager;
-import com.bob.musicaudio.slidingmenu.SlidingMenu;
 import com.bob.musicaudio.unitls.AlwaysMarqueeTextView;
 import com.bob.musicaudio.app.MusicApp;
 import com.bob.musicaudio.unitls.MusicUtils;
@@ -146,7 +145,7 @@ public class MainBottomUIManager implements OnClickListener {
                 mServiceManager.next();
                 break;
           case R.id.btn_menu2:
-              ((MainContentActivity)mActivity).mSlidingMenu.showMenu(true);
+              ((MainActivity)mActivity).mSlidingMenu.showMenu(true);
               break;
         }
     }

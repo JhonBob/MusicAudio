@@ -7,6 +7,8 @@ import android.os.Parcelable;
 /**
  * Created by Administrator on 2015/7/12.
  */
+
+//功能：艺术家音乐数据封装类，实现数据序列化跨进程对象传输
 public class ArtistInfo implements Parcelable {
     public static final String KEY_ARTIST_NAME="artist";
     public static final String KEY_NUMBER_OF_TRACKS="number_of_tracks";

@@ -14,7 +14,7 @@ import android.widget.TextView;
 import com.bob.musicaudio.Interface.IConstants;
 import com.bob.musicaudio.R;
 import com.bob.musicaudio.activity.AboutActivity;
-import com.bob.musicaudio.activity.MainContentActivity;
+import com.bob.musicaudio.activity.MainActivity;
 import com.bob.musicaudio.activity.MenuBackgroundActivity;
 import com.bob.musicaudio.activity.MenuScanActivity;
 import com.bob.musicaudio.activity.MenuSettingActivity;
@@ -25,13 +25,16 @@ import com.bob.musicaudio.slidingmenu.SlidingMenu.OnOpenedListener;
 /**
  * Created by Administrator on 2015/8/5.
  */
+
+
+//侧滑菜单
 public class MenuFragment extends Fragment implements OnClickListener,
         IConstants, OnOpenedListener {
 
     private TextView mMediaCountTv;
     private TextView mScanTv, mPlayModeTv, mBackgroundTv, mSleepTv, mSettingTv,
              mAbout,mExitTv;
-    private MainContentActivity mMainActivity;
+    private MainActivity mMainActivity;
     private MainFragment mMainFragment;
 
     private int mCurMode;
@@ -54,7 +57,7 @@ public class MenuFragment extends Fragment implements OnClickListener,
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mMainActivity = (MainContentActivity) getActivity();
+        mMainActivity = (MainActivity) getActivity();
         mMainActivity.mSlidingMenu.setOnOpenedListener(this);
     }
 

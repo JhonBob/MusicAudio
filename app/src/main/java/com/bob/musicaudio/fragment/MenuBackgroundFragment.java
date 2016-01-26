@@ -32,8 +32,9 @@ import com.bob.musicaudio.unitls.SPStorage;
 /**
  * Created by Administrator on 2015/7/31.
  */
-public class MenuBackgroundFragment extends Fragment implements
-        OnItemClickListener, IConstants, OnClickListener {
+
+//侧滑菜单---背景
+public class MenuBackgroundFragment extends Fragment implements OnItemClickListener, IConstants, OnClickListener {
 
     private ImageButton mBackBtn;
     private GridView mGridView;
@@ -158,19 +159,14 @@ public class MenuBackgroundFragment extends Fragment implements
         mDefaultBgPath = path;
         mAdapter.notifyDataSetChanged();
 
+        //发送背景改变广播
         Intent intent = new Intent(BROADCAST_CHANGEBG);
         intent.putExtra("path", path);
         getActivity().sendBroadcast(intent);
-
-        ((MenuBackgroundActivity) getActivity()).mViewPager.setCurrentItem(0,
-                true);
     }
 
     @Override
     public void onClick(View v) {
-        if (v == mBackBtn) {
-            ((MenuBackgroundActivity) getActivity()).mViewPager.setCurrentItem(
-                    0, true);
-        }
+        getActivity().finish();
     }
 }

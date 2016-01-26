@@ -7,6 +7,8 @@ import android.os.Parcelable;
 /**
  * Created by Administrator on 2015/7/12.
  */
+
+//功能：所有音乐数据封装类，实现数据序列化跨进程对象传输
 public class MusicInfo implements Parcelable {
 
     public final static String KEY_MUSIC= "music";

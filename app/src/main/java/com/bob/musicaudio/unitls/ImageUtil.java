@@ -29,6 +29,8 @@ import android.graphics.drawable.Drawable;
 /**
  * Created by Administrator on 2015/8/6.
  */
+
+//功能：专辑图片处理类
 public class ImageUtil {
     /**图片的八个位置**/
     public static final int TOP = 0;			//上

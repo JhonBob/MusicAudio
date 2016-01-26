@@ -7,7 +7,10 @@ import android.os.Parcelable;
 /**
  * Created by Administrator on 2015/7/12.
  */
+
+//功能：专辑音乐数据封装类，实现数据序列化跨进程对象传输
 public class AlbumInfo implements Parcelable {
+
     public static final String KEY_ALBUM_NAME="album_name";
     public static final String KEY_ALBUM_ID="album_id";
     public static final String KEY_NUMBER_OF_SONGS="number_of_songs";

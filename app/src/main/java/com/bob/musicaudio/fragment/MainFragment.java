@@ -8,21 +8,17 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bob.musicaudio.R;
 import com.bob.musicaudio.SQLdatabase.AlbumInfoDao;
 import com.bob.musicaudio.SQLdatabase.ArtistInfoDao;
-import com.bob.musicaudio.SQLdatabase.DatabaseHelper;
 import com.bob.musicaudio.SQLdatabase.FavoriteInfoDao;
 import com.bob.musicaudio.SQLdatabase.FolderInfoDao;
 import com.bob.musicaudio.Interface.IConstants;
@@ -34,32 +30,30 @@ import com.bob.musicaudio.uimanager.MainBottomUIManager;
 import com.bob.musicaudio.app.MusicApp;
 import com.bob.musicaudio.SQLdatabase.MusicInfoDao;
 import com.bob.musicaudio.unitls.MusicTimer;
-import com.bob.musicaudio.uimanager.SlidingDrawerManager;
 import com.bob.musicaudio.uimanager.UIManager;
 
 
 /**
  * Created by Administrator on 2015/7/12.
  */
+
+
+//应用程序主界面
 public class MainFragment extends Fragment implements IConstants,UIManager.OnRefreshListener,
-        IOnServiceConnectComplete,View.OnTouchListener{
-    private ListView mListView;
+        IOnServiceConnectComplete{
     public GridView mGridView;
     private MyListViewAdapter mAdapter;
-    protected IMediaService mService;
-    private ImageButton imageButtonp;
-    private DatabaseHelper mHelper;
     public UIManager mUIManager;
-    private SlidingDrawerManager mSdm;
-    private MusicTimer mMusicTimer;
+    public MusicTimer mMusicTimer;
 
+    //数据库API
     private MusicInfoDao mMusicDao;
     private FolderInfoDao mFolderDao;
     private ArtistInfoDao mArtistDao;
     private AlbumInfoDao mAlbumDao;
     private FavoriteInfoDao mFavoriteDao;
 
-    private RelativeLayout mBottomLayout,mMainLayout;
+    public RelativeLayout mBottomLayout,mMainLayout;
     private ServiceManager mServiceManager;
     private MainBottomUIManager mBottomUIManager;
     private MusicPlayBroadcast mPlayBroadcast;
@@ -83,27 +77,25 @@ public class MainFragment extends Fragment implements IConstants,UIManager.OnRef
         mGridView=(GridView)v.findViewById(R.id.gridview);
         mAdapter=new MyListViewAdapter();
 
+        //界面布局
         mMainLayout=(RelativeLayout)v.findViewById(R.id.mainLayout);
-        mMainLayout.setOnTouchListener(this);
         mBottomLayout=(RelativeLayout)v.findViewById(R.id.bottomLayout);
 
-
+        //服务管理
         MusicApp.mServiceManager.connectService();
         MusicApp.mServiceManager.setOnServiceConnectComplete(this);
 
+        //设置适配
         mGridView.setAdapter(mAdapter);
 
         mUIManager=new UIManager(getActivity(),v);
         mUIManager.setOnRefreshListener(this);
 
 
-        mSdm = new SlidingDrawerManager(getActivity(), mServiceManager, v);
         mBottomUIManager = new MainBottomUIManager(getActivity(), v);
-        mMusicTimer = new MusicTimer(mSdm.mHandler, mBottomUIManager.mHandler);
-        mSdm.setMusicTimer(mMusicTimer);
 
 
-
+        //广播处理动态注册
         mPlayBroadcast = new MusicPlayBroadcast();
         IntentFilter filter = new IntentFilter(BROADCAST_NAME);
         filter.addAction(BROADCAST_NAME);
@@ -111,6 +103,7 @@ public class MainFragment extends Fragment implements IConstants,UIManager.OnRef
         return v;
     }
 
+    //布局适配器
     private class MyListViewAdapter extends BaseAdapter{
         private int musicNum=0,artistNum=0,albumNum=0,favoriteNum=0,folderNum=0;
         private int[] drawable=new int[]{R.drawable.icon_local_music,
@@ -195,6 +188,8 @@ public class MainFragment extends Fragment implements IConstants,UIManager.OnRef
             holder.nameTv.setText(name[position]);
             return convertView;
         }
+
+        //设置数据
         public void setNum(int music_num,int artist_num,int album_num,
                            int folder_num,int favorite_num){
             musicNum=music_num;
@@ -205,11 +200,14 @@ public class MainFragment extends Fragment implements IConstants,UIManager.OnRef
            notifyDataSetChanged();
         }
 
+        //缓存复用
         private class ViewHolder {
             ImageView iv;
             TextView nameTv, numTv;
         }
     }
+
+    //刷新界面数据
     public void refreshNum() {
         int musicCount = mMusicDao.getDataCount();
         int artistCount = mArtistDao.getDataCount();
@@ -227,6 +225,8 @@ public class MainFragment extends Fragment implements IConstants,UIManager.OnRef
     }
 
 
+
+    //服务回掉刷新主界面数据
     @Override
     public void onServiceConnectComplete(IMediaService service) {
         // service绑定成功会执行到这里
@@ -241,7 +241,6 @@ public class MainFragment extends Fragment implements IConstants,UIManager.OnRef
             if (intent.getAction().equals(BROADCAST_NAME)) {
                 MusicInfo music = new MusicInfo();
                 int playState = intent.getIntExtra(PLAY_STATE_NAME, MPS_NOFILE);
-                int curPlayIndex = intent.getIntExtra(PLAY_MUSIC_INDEX, -1);
                 Bundle bundle = intent.getBundleExtra(MusicInfo.KEY_MUSIC);
                 if (bundle != null) {
                     music = bundle.getParcelable(MusicInfo.KEY_MUSIC);
@@ -249,18 +248,13 @@ public class MainFragment extends Fragment implements IConstants,UIManager.OnRef
 
                 switch (playState) {
                     case MPS_INVALID:// 考虑后面加上如果文件不可播放直接跳到下一首
-                        mMusicTimer.stopTimer();
-                        mSdm.refreshUI(0, music.duration, music);
-                        mSdm.showPlay(true);
+                        //mMusicTimer.stopTimer();
 
                         mBottomUIManager.refreshUI(0, music.duration, music);
                         mBottomUIManager.showPlay(true);
                         break;
                     case MPS_PAUSE:
-                        mMusicTimer.stopTimer();
-                        mSdm.refreshUI(mServiceManager.position(), music.duration,
-                                music);
-                        mSdm.showPlay(true);
+                        //mMusicTimer.stopTimer();
 
                         mBottomUIManager.refreshUI(mServiceManager.position(), music.duration,
                                 music);
@@ -269,10 +263,7 @@ public class MainFragment extends Fragment implements IConstants,UIManager.OnRef
                         mServiceManager.cancelNotification();
                         break;
                     case MPS_PLAYING:
-                        mMusicTimer.startTimer();
-                        mSdm.refreshUI(mServiceManager.position(), music.duration,
-                                music);
-                        mSdm.showPlay(false);
+                        //mMusicTimer.startTimer();
 
                         mBottomUIManager.refreshUI(mServiceManager.position(), music.duration,
                                 music);
@@ -280,30 +271,13 @@ public class MainFragment extends Fragment implements IConstants,UIManager.OnRef
 
                         break;
                     case MPS_PREPARE:
-                        mMusicTimer.stopTimer();
-                        mSdm.refreshUI(0, music.duration, music);
-                        mSdm.showPlay(true);
-
+                       // mMusicTimer.stopTimer();
                         mBottomUIManager.refreshUI(0, music.duration, music);
                         mBottomUIManager.showPlay(true);
                         break;
                 }
             }
         }
-    }
-
-    int oldY = 0;
-    @Override
-    public boolean onTouch(View v, MotionEvent event) {
-        int bottomTop = mBottomLayout.getTop();
-        System.out.println(bottomTop);
-        if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            oldY = (int) event.getY();
-            if (oldY > bottomTop) {
-                mSdm.open();
-            }
-        }
-        return true;
     }
 
 }

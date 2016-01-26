@@ -11,8 +11,6 @@ import java.io.File;
  * Created by Administrator on 2015/7/23.
  */
 public class MusicApp extends Application {
-    //时钟休眠
-    public static boolean mIsSleepClockSetting = false;
     //服务管理
     public static ServiceManager mServiceManager = null;
     //歌词音乐存储路径

@@ -14,6 +14,8 @@ import com.bob.musicaudio.R;
 /**
  * Created by Administrator on 2015/7/20.
  */
+
+//功能：启动动画
 public class SplashScreen {
 
     public final static int SLIDE_LEFT = 1;

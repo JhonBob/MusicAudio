@@ -15,7 +15,7 @@ import android.widget.RemoteViews;
 
 import com.bob.musicaudio.Interface.IConstants;
 import com.bob.musicaudio.R;
-import com.bob.musicaudio.activity.MainContentActivity;
+import com.bob.musicaudio.activity.MainActivity;
 import com.bob.musicaudio.model.MusicInfo;
 import com.bob.musicaudio.unitls.SPStorage;
 
@@ -24,25 +24,38 @@ import java.util.List;
 /**
  * Created by Administrator on 2015/7/22.
  */
+
+//功能：音乐服务类
 public class MediaService extends Service implements IConstants {
+    //暂停广播名
     private static final String PAUSE_BROADCAST_NAME = "com.bob.musicaudio.pause.broadcast";
+    //下一首广播名
     private static final String NEXT_BROADCAST_NAME = "com.bob.musicaudio.next.broadcast";
+    //上一首广播名
     private static final String PRE_BROADCAST_NAME = "com.bob.musicaudio.pre.broadcast";
+    //暂停标志
     private static final int PAUSE_FLAG = 0x1;
+    //下一首标志
     private static final int NEXT_FLAG = 0x2;
+    //上一首标志
     private static final int PRE_FLAG = 0x3;
 
+    //音乐控制
     private MusicControl mMc;
+    //Notification
     private NotificationManager mNotificationManager;
-    //	private Notification mNotification;
     private int NOTIFICATION_ID = 0x1;
+    //远程视图
     private RemoteViews rv;
-    /** 当前是否正在播放 */
+    //当前是否正在播放
     private boolean mIsPlaying;
-    /** 在设置界面是否开启了摇一摇的监听 */
+    //在设置界面是否开启了摇一摇的监听
     public boolean mShake;
+    //属性配置类
     private SPStorage mSp;
+    //音乐播放控制类广播
     private ControlBroadcast mConrolBroadcast;
+    //摇一摇音乐播放广播
     private MusicPlayBroadcast mPlayBroadcast;
 
     @Override
@@ -53,6 +66,7 @@ public class MediaService extends Service implements IConstants {
         mSp = new SPStorage(this);
         mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
+        //动态注册控制类广播
         mConrolBroadcast = new ControlBroadcast();
         IntentFilter filter = new IntentFilter();
         filter.addAction(PAUSE_BROADCAST_NAME);
@@ -60,6 +74,7 @@ public class MediaService extends Service implements IConstants {
         filter.addAction(PRE_BROADCAST_NAME);
         registerReceiver(mConrolBroadcast, filter);
 
+        //动态注册摇一摇广播
         mPlayBroadcast = new MusicPlayBroadcast();
         IntentFilter filter1 = new IntentFilter(BROADCAST_NAME);
         filter1.addAction(BROADCAST_SHAKE);
@@ -67,22 +82,21 @@ public class MediaService extends Service implements IConstants {
     }
 
 
-    /**更新notification
-     * @param bitmap
-     * @param title
-     * @param name
-     */
+    //更新notification
     private void updateNotification(Bitmap bitmap, String title, String name) {
-        Intent intent = new Intent(getApplicationContext(),
-                MainContentActivity.class);
+        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+        //服务里使用Intent要立Flag
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent pi = PendingIntent.getActivity(getApplicationContext(),
-                0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        //挂起意图
+        PendingIntent pi = PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        //初始化通知的布局
         rv = new RemoteViews(this.getPackageName(), R.layout.notification);
+        //新建Notification
         Notification notification = new Notification();
         notification.icon = R.drawable.ic_launcher;
         notification.tickerText = title;
         notification.contentIntent = pi;
+        //初始化View
         notification.contentView = rv;
         notification.flags |= Notification.FLAG_ONGOING_EVENT;
 
@@ -114,6 +128,8 @@ public class MediaService extends Service implements IConstants {
         startForeground(NOTIFICATION_ID, notification);
     }
 
+
+    //摇晃切歌广播接收处理
     private class MusicPlayBroadcast extends BroadcastReceiver {
 
         @Override
@@ -133,6 +149,7 @@ public class MediaService extends Service implements IConstants {
         }
     }
 
+    //处理来自MusicControl的广播
     private class ControlBroadcast extends BroadcastReceiver {
 
         @Override
@@ -158,11 +175,17 @@ public class MediaService extends Service implements IConstants {
         mNotificationManager.cancel(NOTIFICATION_ID);
     }
 
+
+    //抽出Ibinder接口
     @Override
     public IBinder onBind(Intent intent) {
         return mBinder;
     }
 
+    private final IBinder mBinder = new ServerStub();
+
+
+    //实现AIDL封装的跨进程处理方法
     private class ServerStub extends IMediaService.Stub {
 
         @Override
@@ -275,7 +298,8 @@ public class MediaService extends Service implements IConstants {
 
     }
 
-    private final IBinder mBinder = new ServerStub();
+
+    //服务销毁时的处理
     @Override
     public void onDestroy() {
         super.onDestroy();

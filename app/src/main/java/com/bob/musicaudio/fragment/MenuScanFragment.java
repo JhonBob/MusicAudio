@@ -25,6 +25,7 @@ import java.io.File;
 /**
  * Created by Administrator on 2015/7/31.
  */
+//侧滑菜单----数据扫描界面
 public class MenuScanFragment extends Fragment implements IConstants, OnClickListener {
 
     private Button mScanBtn;

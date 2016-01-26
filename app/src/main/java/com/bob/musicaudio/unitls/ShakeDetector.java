@@ -9,6 +9,8 @@ import android.hardware.SensorManager;
 /**
  * Created by Administrator on 2015/8/1.
  */
+
+//功能：晃动切歌
 public class ShakeDetector implements SensorEventListener {
 
     private SensorManager mSensorManager;

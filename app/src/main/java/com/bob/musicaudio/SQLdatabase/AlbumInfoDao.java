@@ -13,6 +13,8 @@ import java.util.List;
 /**
  * Created by Administrator on 2015/7/13.
  */
+
+//专辑音乐数据API
 public class AlbumInfoDao {
     private static final String TABLE_ALBUM="album_info";
     private Context mContext;
@@ -21,6 +23,7 @@ public class AlbumInfoDao {
         mContext=context;
     }
 
+    //存储
     public void saveAlbumInfo(List<AlbumInfo> list){
         SQLiteDatabase db= DatabaseHelper.getInstance(mContext);
         for(AlbumInfo info: list){
@@ -33,6 +36,7 @@ public class AlbumInfoDao {
         }
     }
 
+    //获取
     public List<AlbumInfo> getAlbumInfo(){
         SQLiteDatabase db=DatabaseHelper.getInstance(mContext);
         List<AlbumInfo> list=new ArrayList<AlbumInfo>();
@@ -49,6 +53,8 @@ public class AlbumInfoDao {
         cursor.close();
         return list;
     }
+
+    //是否有数据
     public boolean hasData(){
         SQLiteDatabase db=DatabaseHelper.getInstance(mContext);
         String sql = "select count(*) from " + TABLE_ALBUM;
@@ -64,6 +70,7 @@ public class AlbumInfoDao {
         return  has;
     }
 
+    //数据总数
     public int getDataCount() {
         SQLiteDatabase db = DatabaseHelper.getInstance(mContext);
         String sql = "select count(*) from " + TABLE_ALBUM;
@@ -72,6 +79,7 @@ public class AlbumInfoDao {
         if(cursor.moveToFirst()) {
             count = cursor.getInt(0);
         }
+        cursor.close();
         return count;
     }
 }

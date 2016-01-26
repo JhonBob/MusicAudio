@@ -7,6 +7,8 @@ import android.os.Parcelable;
 /**
  * Created by Administrator on 2015/7/12.
  */
+
+//功能：文件夹音乐数据封装类，实现数据序列化跨进程对象传输
 public class FolderInfo implements Parcelable {
     public static final String KEY_FOLDER_NAME="folder_name";
     public static final String KEY_FOLDER_PATH="folder_path";

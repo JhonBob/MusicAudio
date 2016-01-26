@@ -47,7 +47,6 @@ public class FolderBrowserManager extends MainUIManager implements IConstants,Vi
 
     public View getView() {
         View folderView = mInflater.inflate(R.layout.folderbrower, null);
-        initBg(folderView);
         initView(folderView);
         return folderView;
     }
@@ -64,17 +63,6 @@ public class FolderBrowserManager extends MainUIManager implements IConstants,Vi
         mListView.setAdapter(mAdapter);
     }
 
-    private void initBg(View view) {
-        mFolderLayout = (RelativeLayout) view
-                .findViewById(R.id.main_folder_layout);
-        SPStorage mSp = new SPStorage(mActivity);
-        String mDefaultBgPath = mSp.getPath();
-        Bitmap bitmap = mUIManager.getBitmapByPath(mDefaultBgPath);
-        if (bitmap != null) {
-            mFolderLayout.setBackgroundDrawable(new BitmapDrawable(mActivity
-                    .getResources(), bitmap));
-        }
-    }
 
     private class MyAdapter extends BaseAdapter {
 
@@ -131,15 +119,6 @@ public class FolderBrowserManager extends MainUIManager implements IConstants,Vi
     @Override
     public void onClick(View v) {
         mUIManager.setCurrentItem();
-    }
-
-    @Override
-    protected void setBgByPath(String path) {
-        Bitmap bitmap = mUIManager.getBitmapByPath(path);
-        if (bitmap != null) {
-            mFolderLayout.setBackgroundDrawable(new BitmapDrawable(mActivity
-                    .getResources(), bitmap));
-        }
     }
 
     @Override

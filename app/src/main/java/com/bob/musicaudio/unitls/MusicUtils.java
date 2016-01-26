@@ -36,7 +36,10 @@ import com.bob.musicaudio.model.MusicInfo;
 /**
  * Created by Administrator on 2015/7/13.
  */
+
+//功能：音乐数据处理
 public class MusicUtils implements IConstants {
+    //所有音乐查询条件数组
     private static String[] proj_music=new String[]{
             MediaStore.Audio.Media._ID,
             MediaStore.Audio.Media.TITLE,
@@ -46,37 +49,36 @@ public class MusicUtils implements IConstants {
             MediaStore.Audio.Media.ARTIST_ID,
             MediaStore.Audio.Media.DURATION
     };
-
+    //专辑音乐查询数组
     private static String[] proj_album=new String[]{
             MediaStore.Audio.Albums.ALBUM,
             MediaStore.Audio.Albums.NUMBER_OF_SONGS,
             MediaStore.Audio.Albums._ID,
             MediaStore.Audio.Albums.ALBUM_ART
     };
-
+    //艺术家音乐查询数组
     private static String[] proj_artist=new String[]{
             MediaStore.Audio.Artists.ARTIST,
             MediaStore.Audio.Artists.NUMBER_OF_TRACKS
     };
-
+    //文件夹音乐查询数组
     private static String[] proj_folder=new String[]{
             MediaStore.Files.FileColumns.DATA
     };
 
+    //过滤条件
     public static final int FILTER_SIZE=1*1024*1024;//1MB
     public static final int FILTER_DURATION = 1 * 60 * 1000;// 1分钟
+    //艺术加Bitmap优化处理
     private static final BitmapFactory.Options sBitmapOptionsCache = new BitmapFactory.Options();
     private static final BitmapFactory.Options sBitmapOptions = new BitmapFactory.Options();
     private static final HashMap<Long, Bitmap> sArtCache = new HashMap<Long, Bitmap>();
-    private static final Uri sArtworkUri = Uri
-            .parse("content://media/external/audio/albumart");
+    private static final Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
 
     static {
-        // for the cache,
-        // 565 is faster to decode and display
-        // and we don't want to dither here because the image will be scaled
-        // down later
+        //565快速编码和显示
         sBitmapOptionsCache.inPreferredConfig = Bitmap.Config.RGB_565;
+        //禁止图片缩放
         sBitmapOptionsCache.inDither = false;
 
         sBitmapOptions.inPreferredConfig = Bitmap.Config.RGB_565;
@@ -97,25 +99,26 @@ public class MusicUtils implements IConstants {
 
 
     public static List<MusicInfo> queryFavorite(Context context) {
+        //复用对象优化
         if(mFavoriteDao == null) {
             mFavoriteDao = new FavoriteInfoDao(context);
         }
+        //从数据库返回音乐数据
         return mFavoriteDao.getMusicInfo();
     }
 
 
-    /**
-     * 获取包含音频文件的文件夹信息
-     * @param context
-     * @return
-     */
+    //获取包含音频文件的文件夹信息
     public static List<FolderInfo> queryFolder(Context context) {
         if(mFolderInfoDao == null) {
             mFolderInfoDao = new FolderInfoDao(context);
         }
+
         SPStorage sp = new SPStorage(context);
         Uri uri = MediaStore.Files.getContentUri("external");
+        //内容提供者
         ContentResolver cr = context.getContentResolver();
+        //构建查询条件
         StringBuilder mSelection = new StringBuilder(FileColumns.MEDIA_TYPE
                 + " = " + FileColumns.MEDIA_TYPE_AUDIO + " and " + "("
                 + FileColumns.DATA + " like'%.mp3' or " + Media.DATA
@@ -127,7 +130,9 @@ public class MusicUtils implements IConstants {
         if(sp.getFilterTime()) {
             mSelection.append(" and " + Media.DURATION + " > " + FILTER_DURATION);
         }
+
         mSelection.append(") group by ( " + FileColumns.PARENT);
+        //数据库存在文件时返回数据，否则查询内容提供者并添加到数据库
         if (mFolderInfoDao.hasData()) {
             return mFolderInfoDao.getFolderInfo();
         } else {
@@ -138,20 +143,19 @@ public class MusicUtils implements IConstants {
     }
 
 
-    /**
-     * 获取歌手信息
-     * @param context
-     * @return
-     */
+    //获取歌手信息
     public static List<ArtistInfo> queryArtist(Context context) {
         if(mArtistInfoDao == null) {
             mArtistInfoDao = new ArtistInfoDao(context);
         }
+        //内容提供者路径
         Uri uri = MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI;
         ContentResolver cr = context.getContentResolver();
+        //数据库存在艺术家时返回数据，否则查询内容提供者并添加到数据库
         if (mArtistInfoDao.hasData()) {
             return mArtistInfoDao.getArtistInfo();
         } else {
+            //降序查询
             List<ArtistInfo> list = getArtistList(cr.query(uri, proj_artist,
                     null, null, MediaStore.Audio.Artists.NUMBER_OF_TRACKS
                             + " desc"));
@@ -161,20 +165,17 @@ public class MusicUtils implements IConstants {
     }
 
 
-    /**
-     * 获取专辑信息
-     * @param context
-     * @return
-     */
+    //获取专辑信息
     public static List<AlbumInfo> queryAlbums(Context context) {
         if(mAlbumInfoDao == null) {
             mAlbumInfoDao = new AlbumInfoDao(context);
         }
 
         SPStorage sp = new SPStorage(context);
-
+        //查询路径
         Uri uri = Albums.EXTERNAL_CONTENT_URI;
         ContentResolver cr = context.getContentResolver();
+        //连表查询
         StringBuilder where = new StringBuilder(Albums._ID
                 + " in (select distinct " + Media.ALBUM_ID
                 + " from audio_meta where (1=1 ");
@@ -199,12 +200,8 @@ public class MusicUtils implements IConstants {
     }
 
 
-    /**
-     *
-     * @param context
-     * @param from 不同的界面进来要做不同的查询
-     * @return
-     */
+
+    //对数据库的操作，不同的界面进来要做不同的查询
     public static List<MusicInfo> queryMusic(Context context, int from) {
         return queryMusic(context, null, null, from);
     }
@@ -215,9 +212,10 @@ public class MusicUtils implements IConstants {
             mMusicInfoDao = new MusicInfoDao(context);
         }
         SPStorage sp = new SPStorage(context);
+        //构建路径
         Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         ContentResolver cr = context.getContentResolver();
-
+        //构建查询条件
         StringBuffer select = new StringBuffer(" 1=1 ");
         // 查询语句：检索出.mp3为后缀名，时长大于1分钟，文件大小大于1MB的媒体文件
         if(sp.getFilterSize()) {
@@ -244,13 +242,11 @@ public class MusicUtils implements IConstants {
                 }
             case START_FROM_ARTIST:
                 if (mMusicInfoDao.hasData()) {
-                    return mMusicInfoDao.getMusicInfoByType(selection,
-                            START_FROM_ARTIST);
+                    return mMusicInfoDao.getMusicInfoByType(selection, START_FROM_ARTIST);
                 }
             case START_FROM_ALBUM:
                 if (mMusicInfoDao.hasData()) {
-                    return mMusicInfoDao.getMusicInfoByType(selection,
-                            START_FROM_ALBUM);
+                    return mMusicInfoDao.getMusicInfoByType(selection, START_FROM_ALBUM);
                 }
             case START_FROM_FOLDER:
                 if(mMusicInfoDao.hasData()) {
@@ -263,57 +259,59 @@ public class MusicUtils implements IConstants {
     }
 
 
+    //以下为实际查询的方法
+    //按文件夹查询
     public static List<FolderInfo> getFolderList(Cursor cursor) {
         List<FolderInfo> list = new ArrayList<FolderInfo>();
         while (cursor.moveToNext()) {
+            //初始化封装类
             FolderInfo info = new FolderInfo();
-            String filePath = cursor.getString(cursor
-                    .getColumnIndex(MediaStore.Files.FileColumns.DATA));
-            info.folder_path = filePath.substring(0,
-                    filePath.lastIndexOf(File.separator));
-            info.folder_name = info.folder_path.substring(info.folder_path
-                    .lastIndexOf(File.separator) + 1);
-            list.add(info);
-        }
-        cursor.close();
-        return list;
-    }
-    public static List<ArtistInfo> getArtistList(Cursor cursor) {
-        List<ArtistInfo> list = new ArrayList<ArtistInfo>();
-        while (cursor.moveToNext()) {
-            ArtistInfo info = new ArtistInfo();
-            info.artist_name = cursor.getString(cursor
-                    .getColumnIndex(MediaStore.Audio.Artists.ARTIST));
-            info.number_of_tracks = cursor.getInt(cursor
-                    .getColumnIndex(MediaStore.Audio.Artists.NUMBER_OF_TRACKS));
-            list.add(info);
-        }
-        cursor.close();
-        return list;
-    }
-    public static List<AlbumInfo> getAlbumList(Cursor cursor) {
-        List<AlbumInfo> list = new ArrayList<AlbumInfo>();
-        while (cursor.moveToNext()) {
-            AlbumInfo info = new AlbumInfo();
-            info.album_name = cursor.getString(cursor
-                    .getColumnIndex(Albums.ALBUM));
-            info.album_id = cursor.getInt(cursor.getColumnIndex(Albums._ID));
-            info.number_of_songs = cursor.getInt(cursor
-                    .getColumnIndex(Albums.NUMBER_OF_SONGS));
-            info.album_art = cursor.getString(cursor
-                    .getColumnIndex(Albums.ALBUM_ART));
+            String filePath = cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA));
+            info.folder_path = filePath.substring(0, filePath.lastIndexOf(File.separator));
+            info.folder_name = info.folder_path.substring(info.folder_path.lastIndexOf(File.separator) + 1);
             list.add(info);
         }
         cursor.close();
         return list;
     }
 
+    //按艺术家查询
+    public static List<ArtistInfo> getArtistList(Cursor cursor) {
+        List<ArtistInfo> list = new ArrayList<ArtistInfo>();
+        while (cursor.moveToNext()) {
+            ArtistInfo info = new ArtistInfo();
+            info.artist_name = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Artists.ARTIST));
+            //歌曲数目
+            info.number_of_tracks = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Artists.NUMBER_OF_TRACKS));
+            list.add(info);
+        }
+        cursor.close();
+        return list;
+    }
+
+    //按专辑查询
+    public static List<AlbumInfo> getAlbumList(Cursor cursor) {
+        List<AlbumInfo> list = new ArrayList<AlbumInfo>();
+        while (cursor.moveToNext()) {
+            AlbumInfo info = new AlbumInfo();
+            info.album_name = cursor.getString(cursor.getColumnIndex(Albums.ALBUM));
+            info.album_id = cursor.getInt(cursor.getColumnIndex(Albums._ID));
+            //歌曲数目
+            info.number_of_songs = cursor.getInt(cursor.getColumnIndex(Albums.NUMBER_OF_SONGS));
+            info.album_art = cursor.getString(cursor.getColumnIndex(Albums.ALBUM_ART));
+            list.add(info);
+        }
+        cursor.close();
+        return list;
+    }
+    //查询所有音乐数据
     public static ArrayList<MusicInfo> getMusicList(Cursor cursor) {
         if (cursor == null) {
             return null;
         }
         ArrayList<MusicInfo> musicList = new ArrayList<MusicInfo>();
         while (cursor.moveToNext()) {
+            //音乐数据封装类
             MusicInfo music = new MusicInfo();
             music.songId = cursor.getInt(cursor
                     .getColumnIndex(MediaStore.Audio.Media._ID));
@@ -326,11 +324,10 @@ public class MusicUtils implements IConstants {
             music.artist = cursor.getString(cursor
                     .getColumnIndex(MediaStore.Audio.Media.ARTIST));
 
-            String filePath = cursor.getString(cursor
-                    .getColumnIndex(MediaStore.Audio.Media.DATA));
+            String filePath = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
             music.data = filePath;
-            String folderPath = filePath.substring(0,
-                    filePath.lastIndexOf(File.separator));
+
+            String folderPath = filePath.substring(0, filePath.lastIndexOf(File.separator));
             music.folder = folderPath;
             musicList.add(music);
         }
@@ -338,13 +335,7 @@ public class MusicUtils implements IConstants {
         return musicList;
     }
 
-    /**
-     * 根据歌曲的ID，寻找出歌曲在当前播放列表中的位置
-     *
-     * @param list
-     * @param id
-     * @return
-     */
+   //根据歌曲的ID，寻找出歌曲在当前播放列表中的位置，遍历集合
     public static int seekPosInListById(List<MusicInfo> list, int id) {
         if(id == -1) {
             return -1;
@@ -362,6 +353,7 @@ public class MusicUtils implements IConstants {
         return result;
     }
 
+    //格式化时间
     public static String makeTimeString(long milliSecs) {
         StringBuffer sb = new StringBuffer();
         long m = milliSecs / (60 * 1000);
@@ -372,6 +364,7 @@ public class MusicUtils implements IConstants {
         return sb.toString();
     }
 
+    //艺术家图片处理
     public static Bitmap getCachedArtwork(Context context, long artIndex,
                                           Bitmap defaultArtwork) {
         Bitmap bitmap = null;
@@ -388,6 +381,7 @@ public class MusicUtils implements IConstants {
             Bitmap b = MusicUtils.getArtworkQuick(context, artIndex, w, h);
             if (b != null) {
                 bitmap = b;
+                //异步加锁
                 synchronized (sArtCache) {
                     // the cache may have changed since we checked
                     Bitmap value = sArtCache.get(artIndex);
@@ -402,6 +396,7 @@ public class MusicUtils implements IConstants {
         return bitmap;
     }
 
+    //查询艺术家图片
     public static Bitmap getArtworkQuick(Context context, long album_id, int w,
                                          int h) {
         // NOTE: There is in fact a 1 pixel border on the right side in the
@@ -422,8 +417,8 @@ public class MusicUtils implements IConstants {
                 // and pass that to sBitmapOptionsCache.inSampleSize, which will
                 // result in faster decoding and better quality
                 sBitmapOptionsCache.inJustDecodeBounds = true;
-                BitmapFactory.decodeFileDescriptor(fd.getFileDescriptor(),
-                        null, sBitmapOptionsCache);
+                //Bitmap优化
+                BitmapFactory.decodeFileDescriptor(fd.getFileDescriptor(), null, sBitmapOptionsCache);
                 int nextWidth = sBitmapOptionsCache.outWidth >> 1;
                 int nextHeight = sBitmapOptionsCache.outHeight >> 1;
                 while (nextWidth > w && nextHeight > h) {

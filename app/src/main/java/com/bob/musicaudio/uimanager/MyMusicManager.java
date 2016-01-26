@@ -38,7 +38,9 @@ import com.bob.musicaudio.unitls.SPStorage;
 /**
  * Created by Administrator on 2015/7/23.
  */
-public class MyMusicManager extends MainUIManager implements IConstants,OnTouchListener{
+
+//我的音乐
+public class MyMusicManager extends MainUIManager implements IConstants{
 
     private LayoutInflater mInflater;
     private Activity mActivity;
@@ -47,16 +49,14 @@ public class MyMusicManager extends MainUIManager implements IConstants,OnTouchL
     private MyAdapter mAdapter;
     private ListView mListView;
     private ServiceManager mServiceManager = null;
-    private MusicTimer mMusicTimer;
     private MyMusicUIManager mUIm;
-    private SlidingDrawerManager mSdm;
     private MusicPlayBroadcast mPlayBroadcast;
 
 
     private int mFrom;
     private Object mObj;
 
-    private RelativeLayout mBottomLayout, mMainLayout;
+    public RelativeLayout mBottomLayout, mMainLayout;
     private Bitmap defaultArtwork;
 
     private UIManager mUIManager;
@@ -75,127 +75,102 @@ public class MyMusicManager extends MainUIManager implements IConstants,OnTouchL
         View contentView = mInflater.inflate(R.layout.mymusic, null);
         mFrom = from;
         mObj = object;
-        initBg(contentView);
         initView(contentView);
-
         return contentView;
     }
 
     private void initView(View view) {
-        defaultArtwork = BitmapFactory.decodeResource(mActivity.getResources(),
-                R.drawable.img_album_background);
+        defaultArtwork = BitmapFactory.decodeResource(mActivity.getResources(), R.drawable.img_album_background);
+        //获得服务管理对象
         mServiceManager = MusicApp.mServiceManager;
 
         mMainLayout=(RelativeLayout)view.findViewById(R.id.main_mymusic_layout);
-        mMainLayout.setOnTouchListener(this);
-
         mBottomLayout = (RelativeLayout) view.findViewById(R.id.bottomLayout);
-
+        //音乐列表
         mListView = (ListView) view.findViewById(R.id.music);
 
         mActivity.setVolumeControlStream(AudioManager.STREAM_MUSIC);
+        //动态注册广播
         mPlayBroadcast = new MusicPlayBroadcast();
         IntentFilter filter = new IntentFilter(BROADCAST_NAME);
         filter.addAction(BROADCAST_NAME);
         filter.addAction(BROADCAST_QUERY_COMPLETE_NAME);
         mActivity.registerReceiver(mPlayBroadcast, filter);
-
-        mUIm = new MyMusicUIManager(mActivity, mServiceManager, view,
-                mUIManager);
-        mSdm = new SlidingDrawerManager(mActivity, mServiceManager, view);
-        mMusicTimer = new MusicTimer(mSdm.mHandler, mUIm.mHandler);
-        mSdm.setMusicTimer(mMusicTimer);
-
-
+        //获得UI管理对象
+        mUIm = new MyMusicUIManager(mActivity, mServiceManager, view, mUIManager);
+        //初始化列表控件
         initListView();
-
+        //初始化列表控件状态
         initListViewStatus();
 
     }
 
-    private void initBg(View view) {
-        mMainLayout = (RelativeLayout) view
-                .findViewById(R.id.main_mymusic_layout);
-        SPStorage mSp = new SPStorage(mActivity);
-        String mDefaultBgPath = mSp.getPath();
-        Bitmap bitmap = mUIManager.getBitmapByPath(mDefaultBgPath);
-        if (bitmap != null) {
-            mMainLayout.setBackgroundDrawable(new BitmapDrawable(mActivity
-                    .getResources(), bitmap));
-        } else {
-            mMainLayout.setBackgroundResource(R.drawable.bg);
-        }
-    }
-
-
+    //初始化列表控件
     private void initListView() {
+        //列表适配
         mAdapter = new MyAdapter(mActivity, mServiceManager);
         mListView.setAdapter(mAdapter);
-
+        //列表点击事件处理
         mListView.setOnItemClickListener(new OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> arg0, View arg1,
                                     int position, long arg3) {
+                //刷新列表
                 mAdapter.refreshPlayingList();
-                mServiceManager
-                        .playById(mAdapter.getData().get(position).songId);
+                //播放点中的歌曲
+                mServiceManager.playById(mAdapter.getData().get(position).songId);
             }
         });
+
+        //构建查询条件
         StringBuffer select = new StringBuffer();
+        //按条件查询
         switch (mFrom) {
             case START_FROM_ARTIST:
+                //对象强转
                 ArtistInfo artistInfo = (ArtistInfo) mObj;
-                // select.append(" and " + Media.ARTIST + " = '"
-                // + artistInfo.artist_name + "'");
-                mAdapter.setData(MusicUtils.queryMusic(mActivity,
-                        select.toString(), artistInfo.artist_name,
-                        START_FROM_ARTIST));
+                //调用查询引擎，向适配器集合添加数据
+                mAdapter.setData(MusicUtils.queryMusic(mActivity, select.toString(), artistInfo.artist_name, START_FROM_ARTIST));
                 break;
             case START_FROM_ALBUM:
                 AlbumInfo albumInfo = (AlbumInfo) mObj;
-                // select.append(" and " + Media.ALBUM_ID + " = "
-                // + albumInfo.album_id);
-                mAdapter.setData(MusicUtils.queryMusic(mActivity,
-                        select.toString(), albumInfo.album_id + "",
-                        START_FROM_ALBUM));
+                //调用查询引擎，向适配器集合添加数据
+                mAdapter.setData(MusicUtils.queryMusic(mActivity, select.toString(), albumInfo.album_id + "", START_FROM_ALBUM));
                 break;
             case START_FROM_FOLDER:
                 FolderInfo folderInfo = (FolderInfo) mObj;
-                // select.append(" and " + Media.DATA + " like '"
-                // + folderInfo.folder_path + File.separator + "%'");
-                mAdapter.setData(MusicUtils.queryMusic(mActivity,
-                        select.toString(), folderInfo.folder_path,
-                        START_FROM_FOLDER));
+                //调用查询引擎，向适配器集合添加数据
+                mAdapter.setData(MusicUtils.queryMusic(mActivity, select.toString(), folderInfo.folder_path, START_FROM_FOLDER));
                 break;
             case START_FROM_FAVORITE:
-                mAdapter.setData(MusicUtils.queryFavorite(mActivity),
-                        START_FROM_FAVORITE);
+                mAdapter.setData(MusicUtils.queryFavorite(mActivity), START_FROM_FAVORITE);
                 break;
             default:
+                //默认查询
                 mAdapter.setData(MusicUtils.queryMusic(mActivity, START_FROM_LOCAL));
                 break;
         }
     }
 
 
+    //初始化列表控件状态
     private void initListViewStatus() {
         try {
-            mSdm.setListViewAdapter(mAdapter);
+            //获得服务的播放状态
             int playState = mServiceManager.getPlayState();
             if (playState == MPS_NOFILE || playState == MPS_INVALID) {
                 return;
             }
             if (playState == MPS_PLAYING) {
-                mMusicTimer.startTimer();
+                //mMusicTimer.startTimer();
             }
+
             List<MusicInfo> musicList = mAdapter.getData();
-            int playingSongPosition = MusicUtils.seekPosInListById(musicList,
-                    mServiceManager.getCurMusicId());
+            //获得当前播放位置
+            int playingSongPosition = MusicUtils.seekPosInListById(musicList, mServiceManager.getCurMusicId());
             mAdapter.setPlayState(playState, playingSongPosition);
             MusicInfo music = mServiceManager.getCurMusic();
-            mSdm.refreshUI(mServiceManager.position(), music.duration, music);
-            mSdm.showPlay(false);
             mUIm.refreshUI(mServiceManager.position(), music.duration, music);
             mUIm.showPlay(false);
 
@@ -220,19 +195,14 @@ public class MyMusicManager extends MainUIManager implements IConstants,OnTouchL
                 mAdapter.setPlayState(playState, curPlayIndex);
                 switch (playState) {
                     case MPS_INVALID:// 考虑后面加上如果文件不可播放直接跳到下一首
-                        mMusicTimer.stopTimer();
-                        mSdm.refreshUI(0, music.duration, music);
-                        mSdm.showPlay(true);
+                        //mMusicTimer.stopTimer();
 
                         mUIm.refreshUI(0, music.duration, music);
                         mUIm.showPlay(true);
                         mServiceManager.next();
                         break;
                     case MPS_PAUSE:
-                        mMusicTimer.stopTimer();
-                        mSdm.refreshUI(mServiceManager.position(), music.duration,
-                                music);
-                        mSdm.showPlay(true);
+                        //mMusicTimer.stopTimer();
 
                         mUIm.refreshUI(mServiceManager.position(), music.duration,
                                 music);
@@ -241,10 +211,7 @@ public class MyMusicManager extends MainUIManager implements IConstants,OnTouchL
                         mServiceManager.cancelNotification();
                         break;
                     case MPS_PLAYING:
-                        mMusicTimer.startTimer();
-                        mSdm.refreshUI(mServiceManager.position(), music.duration,
-                                music);
-                        mSdm.showPlay(false);
+                        //mMusicTimer.startTimer();
 
                         mUIm.refreshUI(mServiceManager.position(), music.duration,
                                 music);
@@ -252,57 +219,24 @@ public class MyMusicManager extends MainUIManager implements IConstants,OnTouchL
 
                         Bitmap bitmap = MusicUtils.getCachedArtwork(mActivity,
                                 music.albumId, defaultArtwork);
-                        // Bitmap bitmap = MusicUtils.getArtwork(getActivity(),
-                        // music._id, music.albumId);
-                        // 更新顶部notification
                         mServiceManager.updateNotification(bitmap, music.musicName,
                                 music.artist);
 
                         break;
                     case MPS_PREPARE:
-                        mMusicTimer.stopTimer();
-                        mSdm.refreshUI(0, music.duration, music);
-                        mSdm.showPlay(true);
+                        //mMusicTimer.stopTimer();
 
                         mUIm.refreshUI(0, music.duration, music);
                         mUIm.showPlay(true);
-
-                        // 读取歌词文件
-                       // mSdm.loadLyric(music);
                         break;
                 }
             }
         }
     }
 
-
-    @Override
-    protected void setBgByPath(String path) {
-        Bitmap bitmap = mUIManager.getBitmapByPath(path);
-        if (bitmap != null) {
-            mMainLayout.setBackgroundDrawable(new BitmapDrawable(mActivity
-                    .getResources(), bitmap));
-        }
-    }
-
     @Override
     public View getView() {
         return null;
-    }
-
-    int oldY = 0;
-
-    @Override
-    public boolean onTouch(View v, MotionEvent event) {
-        int bottomTop = mBottomLayout.getTop();
-        System.out.println(bottomTop);
-        if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            oldY = (int) event.getY();
-            if (oldY > bottomTop) {
-                mSdm.open();
-            }
-        }
-        return true;
     }
 
 }

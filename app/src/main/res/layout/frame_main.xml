@@ -5,21 +5,23 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center"
-    android:background="@drawable/bg"
     android:orientation="vertical">
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/top_layout"
         android:layout_width="fill_parent"
-        android:layout_height="35dip"
-        android:background="@color/half_transparent">
+        android:layout_height="50dip"
+        android:background="@color/holo_blue_light">
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:text="我的首页"
+            android:gravity="center"
             android:textColor="@color/white"
             android:textSize="@dimen/title_text_sp"/>
-    </LinearLayout>
+    </RelativeLayout>
+
+
     <RelativeLayout
         android:id="@+id/bottomLayout"
         android:layout_width="fill_parent"
@@ -156,20 +158,6 @@
         android:horizontalSpacing="6.0dip"
         android:numColumns="1"
         android:verticalSpacing="6.0dip" />
-
-
-    <com.bob.musicaudio.unitls.MySlidingDrawer
-        android:id="@+id/slidingDrawer"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:content="@+id/content"
-        android:handle="@+id/handle"
-        android:visibility="invisible" >
-
-        <include layout="@layout/sliding_handle" />
-
-        <include layout="@layout/sliding_content" />
-    </com.bob.musicaudio.unitls.MySlidingDrawer>
 
     <android.support.v4.view.ViewPager
         android:id="@+id/viewPager"

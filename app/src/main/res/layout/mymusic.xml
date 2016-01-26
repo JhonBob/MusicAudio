@@ -9,7 +9,7 @@
         android:id="@+id/topLayout"
         android:layout_width="fill_parent"
         android:layout_height="50dip"
-        android:background="@color/half_transparent" >
+        android:background="@color/holo_blue_light" >
         
         <ImageButton android:id="@+id/backBtn"
             android:layout_width="wrap_content"
@@ -181,18 +181,4 @@
         android:layout_below="@id/topLayout"
         android:divider="@color/divider_color"
         android:dividerHeight="0.5dip" />
-
-    <com.bob.musicaudio.unitls.MySlidingDrawer
-        android:id="@+id/slidingDrawer"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:content="@+id/content"
-        android:handle="@+id/handle"
-        android:visibility="invisible" >
-
-        <include layout="@layout/sliding_handle" />
-
-        <include layout="@layout/sliding_content" />
-    </com.bob.musicaudio.unitls.MySlidingDrawer>
-
 </RelativeLayout>

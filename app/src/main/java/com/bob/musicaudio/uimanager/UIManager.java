@@ -20,7 +20,7 @@ import android.support.v4.view.ViewPager.OnPageChangeListener;
 
 import com.bob.musicaudio.Interface.IConstants;
 import com.bob.musicaudio.R;
-import com.bob.musicaudio.activity.MainContentActivity;
+import com.bob.musicaudio.activity.MainActivity;
 import com.bob.musicaudio.unitls.SPStorage;
 
 import java.io.IOException;
@@ -31,10 +31,12 @@ import java.util.List;
 /**
  * Created by Administrator on 2015/7/22.
  */
-public class UIManager implements IConstants,MainContentActivity.OnBackListener {
+
+
+public class UIManager implements IConstants,MainActivity.OnBackListener {
 
     public interface OnRefreshListener {
-        public void onRefresh();
+         void onRefresh();
     }
 
     private Activity mActivity;
@@ -45,101 +47,60 @@ public class UIManager implements IConstants,MainContentActivity.OnBackListener 
     private List<View> mListViews, mListViewsSub;
 
     private OnRefreshListener mRefreshListener;
-    private MainContentActivity mMainActivity;
+    private MainActivity mMainActivity;
 
     private RelativeLayout mMainLayout;
     private MainUIManager mMainUIManager;
-    private ChangeBgReceiver mReceiver;
-//	private SPStorage mSp;
-//	private String mDefaultBgPath;
 
     public UIManager(Activity activity, View view) {
         this.mActivity = activity;
         this.mView = view;
-        mMainActivity = (MainContentActivity) activity;
+        mMainActivity = (MainActivity) activity;
         this.mInflater = LayoutInflater.from(activity);
-        initBroadCast();
-        initBg();
         init();
     }
 
-    private void initBroadCast() {
-        mReceiver = new ChangeBgReceiver();
-        IntentFilter filter = new IntentFilter(BROADCAST_CHANGEBG);
-        mActivity.registerReceiver(mReceiver, filter);
-    }
 
-    private class ChangeBgReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String path = intent.getStringExtra("path");
-            Bitmap bitmap = getBitmapByPath(path);
-            if(bitmap != null) {
-                mMainLayout.setBackgroundDrawable(new BitmapDrawable(mActivity.getResources(), bitmap));
-            }
-            if(mMainUIManager != null) {
-                mMainUIManager.setBgByPath(path);
-            }
-        }
-    }
-
-    private void initBg() {
-        SPStorage mSp = new SPStorage(mActivity);
-        String mDefaultBgPath = mSp.getPath();
-        mMainLayout = (RelativeLayout) findViewById(R.id.mainLayout);
-        Bitmap bitmap = getBitmapByPath(mDefaultBgPath);
-        if(bitmap != null) {
-            mMainLayout.setBackgroundDrawable(new BitmapDrawable(mActivity.getResources(), bitmap));
-        }
-
-        //如果第一次进来 SharedPreference中没有数据
-        if(TextUtils.isEmpty(mDefaultBgPath)) {
-            mSp.savePath("004.jpg");
-        }
-    }
 
 
     private void init() {
 
+        //获得ViewPage对象
         mViewPager = (ViewPager) findViewById(R.id.viewPager);
         mViewPagerSub = (ViewPager) findViewById(R.id.viewPagerSub);
-
+        //视图集合
         mListViews = new ArrayList<View>();
         mListViewsSub = new ArrayList<View>();
+        //设置也改变监听
         mViewPager.setOnPageChangeListener(new MyOnPageChangeListener());
         mViewPagerSub.setOnPageChangeListener(new MyOnPageChangeListenerSub());
     }
 
-
+    //封装
     private View findViewById(int id) {
         return mView.findViewById(id);
     }
 
-    public Bitmap getBitmapByPath(String path) {
-        AssetManager am = mActivity.getAssets();
-        Bitmap bitmap = null;
-        try {
-            InputStream is = am.open("bkgs/" + path);
-            bitmap = BitmapFactory.decodeStream(is);
-            is.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return bitmap;
-    }
+    //设置主界面刷新监听
     public void setOnRefreshListener(OnRefreshListener listener) {
         mRefreshListener = listener;
     }
 
+
+    //接收主界面传来的的查询标志位进行分类查询
     public void setContentType(int type) {
         // 此处可以根据传递过来的view和type分开来处理
         setContentType(type, null);
     }
 
+
+
     public void setCurrentItem() {
         if (mViewPagerSub.getChildCount() > 0) {
+            //第二层显示为当前
             mViewPagerSub.setCurrentItem(0, true);
         } else {
+            //显示地一层
             mViewPager.setCurrentItem(0, true);
         }
     }
@@ -148,24 +109,31 @@ public class UIManager implements IConstants,MainContentActivity.OnBackListener 
         // 注册监听返回按钮
         mMainActivity.registerBackListener(this);
         switch (type) {
+
+            //进入第一层
             case START_FROM_LOCAL:
                 mMainUIManager = new MyMusicManager(mActivity, this);
-                View transView1 = mInflater.inflate(
-                        R.layout.viewpager_trans_layout, null);
+                //空填充
+                View transView1 = mInflater.inflate(R.layout.viewpager_trans_layout, null);
+                //内容填充
                 View contentView1 = mMainUIManager.getView(START_FROM_LOCAL);
+                //第一层可见
                 mViewPager.setVisibility(View.VISIBLE);
+                //移除集合中所有存在的视图
                 mListViews.clear();
+                //移除第一层中的所有视图
                 mViewPager.removeAllViews();
-
+                //向集合重新添加
                 mListViews.add(transView1);
                 mListViews.add(contentView1);
+                //适配
                 mViewPager.setAdapter(new MyPagerAdapter(mListViews));
+                //只显示一个页卡
                 mViewPager.setCurrentItem(1, true);
                 break;
             case START_FROM_FAVORITE:
                 mMainUIManager = new MyMusicManager(mActivity, this);
-                View transView2 = mInflater.inflate(
-                        R.layout.viewpager_trans_layout, null);
+                View transView2 = mInflater.inflate(R.layout.viewpager_trans_layout, null);
                 View contentView2 = mMainUIManager.getView(START_FROM_FAVORITE);
                 mViewPager.setVisibility(View.VISIBLE);
                 mListViews.clear();
@@ -177,10 +145,8 @@ public class UIManager implements IConstants,MainContentActivity.OnBackListener 
                 mViewPager.setCurrentItem(1, true);
                 break;
             case START_FROM_FOLDER:
-                mMainUIManager = new FolderBrowserManager(
-                        mActivity, this);
-                View transView3 = mInflater.inflate(
-                        R.layout.viewpager_trans_layout, null);
+                mMainUIManager = new FolderBrowserManager(mActivity, this);
+                View transView3 = mInflater.inflate(R.layout.viewpager_trans_layout, null);
                 View folderView = mMainUIManager.getView();
                 mViewPager.setVisibility(View.VISIBLE);
                 mListViews.clear();
@@ -192,10 +158,8 @@ public class UIManager implements IConstants,MainContentActivity.OnBackListener 
                 mViewPager.setCurrentItem(1, true);
                 break;
             case START_FROM_ARTIST:
-                mMainUIManager = new ArtistBrowserManager(
-                        mActivity, this);
-                View transView4 = mInflater.inflate(
-                        R.layout.viewpager_trans_layout, null);
+                mMainUIManager = new ArtistBrowserManager(mActivity, this);
+                View transView4 = mInflater.inflate(R.layout.viewpager_trans_layout, null);
                 View artistView = mMainUIManager.getView();
                 mViewPager.setVisibility(View.VISIBLE);
                 mListViews.clear();
@@ -207,10 +171,8 @@ public class UIManager implements IConstants,MainContentActivity.OnBackListener 
                 mViewPager.setCurrentItem(1, true);
                 break;
             case START_FROM_ALBUM:
-                mMainUIManager = new AlbumBrowserManager(
-                        mActivity, this);
-                View transView5 = mInflater.inflate(
-                        R.layout.viewpager_trans_layout, null);
+                mMainUIManager = new AlbumBrowserManager(mActivity, this);
+                View transView5 = mInflater.inflate(R.layout.viewpager_trans_layout, null);
                 View albumView = mMainUIManager.getView();
                 mViewPager.setVisibility(View.VISIBLE);
                 mListViews.clear();
@@ -221,10 +183,11 @@ public class UIManager implements IConstants,MainContentActivity.OnBackListener 
                 mViewPager.setAdapter(new MyPagerAdapter(mListViews));
                 mViewPager.setCurrentItem(1, true);
                 break;
+
+            //进入第二层
             case FOLDER_TO_MYMUSIC:
                 mMainUIManager = new MyMusicManager(mActivity, this);
-                View transViewSub1 = mInflater.inflate(
-                        R.layout.viewpager_trans_layout, null);
+                View transViewSub1 = mInflater.inflate(R.layout.viewpager_trans_layout, null);
                 View contentViewSub1 = mMainUIManager.getView(START_FROM_FOLDER, obj);
                 mViewPagerSub.setVisibility(View.VISIBLE);
                 mListViewsSub.clear();
@@ -237,8 +200,7 @@ public class UIManager implements IConstants,MainContentActivity.OnBackListener 
                 break;
             case ARTIST_TO_MYMUSIC:
                 mMainUIManager = new MyMusicManager(mActivity, this);
-                View transViewSub2 = mInflater.inflate(
-                        R.layout.viewpager_trans_layout, null);
+                View transViewSub2 = mInflater.inflate(R.layout.viewpager_trans_layout, null);
                 View contentViewSub2 = mMainUIManager.getView(START_FROM_ARTIST, obj);
                 mViewPagerSub.setVisibility(View.VISIBLE);
                 mListViewsSub.clear();
@@ -251,8 +213,7 @@ public class UIManager implements IConstants,MainContentActivity.OnBackListener 
                 break;
             case ALBUM_TO_MYMUSIC:
                 mMainUIManager = new MyMusicManager(mActivity, this);
-                View transViewSub3 = mInflater.inflate(
-                        R.layout.viewpager_trans_layout, null);
+                View transViewSub3 = mInflater.inflate(R.layout.viewpager_trans_layout, null);
                 View contentViewSub3 = mMainUIManager.getView(START_FROM_ALBUM, obj);
                 mViewPagerSub.setVisibility(View.VISIBLE);
                 mListViewsSub.clear();
@@ -296,6 +257,7 @@ public class UIManager implements IConstants,MainContentActivity.OnBackListener 
         }
     }
 
+    //第一层滑动监听
     private class MyOnPageChangeListener implements OnPageChangeListener {
 
         int onPageScrolled = -1;
@@ -303,7 +265,6 @@ public class UIManager implements IConstants,MainContentActivity.OnBackListener 
         // 当滑动状态改变时调用
         @Override
         public void onPageScrollStateChanged(int arg0) {
-            System.out.println("onPageScrollStateChanged--->" + arg0);
             if (onPageScrolled == 0 && arg0 == 0) {
                 mMainActivity.unRegisterBackListener(UIManager.this);
                 mViewPager.removeAllViews();
@@ -312,24 +273,25 @@ public class UIManager implements IConstants,MainContentActivity.OnBackListener 
                     mRefreshListener.onRefresh();
                 }
             }
+            System.out.println("第一层onPageScrollStateChanged--->" + arg0);
         }
 
         // 当当前页面被滑动时调用
         @Override
         public void onPageScrolled(int arg0, float arg1, int arg2) {
             onPageScrolled = arg0;
-            // System.out.println("onPageScrolled--->" + "arg0=" + arg0 +
-            // " arg1="
-            // + arg1 + " arg2=" + arg2);
+            //System.out.println("第一层onPageScrolled--->" + "arg0=" + arg0 + " arg1=" + arg1 + " arg2=" + arg2);
         }
 
         // 当新的页面被选中时调用
         @Override
         public void onPageSelected(int arg0) {
-            // System.out.println("onPageSelected--->" + arg0);
+          System.out.println("第一层onPageSelected--->" + arg0);
         }
     }
 
+
+    //第二层滑动监听
     private class MyOnPageChangeListenerSub implements OnPageChangeListener {
 
         int onPageScrolled = -1;
@@ -341,17 +303,20 @@ public class UIManager implements IConstants,MainContentActivity.OnBackListener 
                 mViewPagerSub.removeAllViews();
                 mViewPagerSub.setVisibility(View.INVISIBLE);
             }
+            System.out.println("第二层onPageScrollStateChanged--->" + arg0);
         }
 
         // 当当前页面被滑动时调用
         @Override
         public void onPageScrolled(int arg0, float arg1, int arg2) {
             onPageScrolled = arg0;
+            //System.out.println("第二层onPageScrolled--->" + "arg0=" + arg0 + " arg1=" + arg1 + " arg2=" + arg2);
         }
 
         // 当新的页面被选中时调用
         @Override
         public void onPageSelected(int arg0) {
+            System.out.println("第二层onPageSelected--->" + arg0);
         }
     }
 

@@ -3,6 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
+
+
     <RelativeLayout
         android:id="@+id/topLayout"
         android:layout_width="fill_parent"
@@ -25,14 +27,15 @@
             android:textColor="@color/white"
             android:textSize="@dimen/title_text_sp"/>
         </RelativeLayout>
+
+
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:layout_below="@id/topLayout"
-        android:layout_marginTop="70dip"
-        android:src="@drawable/img_scan_logo"/>
+        android:layout_marginTop="119dp"
+        android:src="@drawable/img_scan_logo"
+        android:layout_below="@+id/topLayout"
+        android:layout_centerHorizontal="true" />
     <Button
         android:id="@+id/scanbtn"
         android:layout_width="wrap_content"
@@ -41,17 +44,10 @@
         android:text="开始扫描"
         android:textSize="12sp"
         android:textColor="@color/white"
-        android:layout_above="@+id/textView"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="50dp" />
-    <TextView
-        android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        android:textColor="@android:color/darker_gray"
-        android:text="location:"
-        android:layout_marginBottom="47dp"
-        android:id="@+id/textView"
+        android:layout_marginBottom="75dp"
+        android:layout_gravity="center_horizontal"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true" />
+
 
 </RelativeLayout>

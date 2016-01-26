@@ -25,6 +25,7 @@ import java.util.List;
 /**
  * Created by Administrator on 2015/7/23.
  */
+//专辑歌曲显示
 public class AlbumBrowserManager extends MainUIManager implements IConstants,View.OnClickListener,
         AdapterView.OnItemClickListener {
     private Activity mActivity;
@@ -36,8 +37,6 @@ public class AlbumBrowserManager extends MainUIManager implements IConstants,Vie
     private List<AlbumInfo> mAlbumList = new ArrayList<AlbumInfo>();
     private MyAdapter mAdapter;
 
-    private LinearLayout mAlbumLayout;
-
     public AlbumBrowserManager(Activity activity, UIManager manager) {
         this.mActivity = activity;
         this.mUIManager = manager;
@@ -46,7 +45,6 @@ public class AlbumBrowserManager extends MainUIManager implements IConstants,Vie
 
     public View getView() {
         View view = mInflater.inflate(R.layout.albumbrower, null);
-        initBg(view);
         initView(view);
         return view;
     }
@@ -63,15 +61,6 @@ public class AlbumBrowserManager extends MainUIManager implements IConstants,Vie
 
     }
 
-    private void initBg(View view) {
-        mAlbumLayout = (LinearLayout) view.findViewById(R.id.main_album_layout);
-        SPStorage mSp = new SPStorage(mActivity);
-        String mDefaultBgPath = mSp.getPath();
-        Bitmap bitmap = mUIManager.getBitmapByPath(mDefaultBgPath);
-        if(bitmap != null) {
-            mAlbumLayout.setBackgroundDrawable(new BitmapDrawable(mActivity.getResources(), bitmap));
-        }
-    }
 
     private class MyAdapter extends BaseAdapter {
 
@@ -132,15 +121,8 @@ public class AlbumBrowserManager extends MainUIManager implements IConstants,Vie
     public void onItemClick(AdapterView<?> parent, View view, int position,
                             long id) {
 
+        //进入MyMusic界面
         mUIManager.setContentType(ALBUM_TO_MYMUSIC, mAdapter.getItem(position));
-    }
-
-    @Override
-    protected void setBgByPath(String path) {
-        Bitmap bitmap = mUIManager.getBitmapByPath(path);
-        if(bitmap != null) {
-            mAlbumLayout.setBackgroundDrawable(new BitmapDrawable(mActivity.getResources(), bitmap));
-        }
     }
 
     @Override

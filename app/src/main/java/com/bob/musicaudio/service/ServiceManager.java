@@ -22,6 +22,8 @@ import java.util.List;
 /**
  * Created by Administrator on 2015/7/22.
  */
+
+//功能：音乐播放服务管理类，连接，断开服务，调用服务接口所提供的方法
 public class ServiceManager implements IConstants {
     public IMediaService mService;
     private Context mContext;
@@ -44,6 +46,7 @@ public class ServiceManager implements IConstants {
             public void onServiceConnected(ComponentName name, IBinder service) {
                 mService = IMediaService.Stub.asInterface(service);
                 if (mService != null) {
+                    //回掉刷新主界面数据
                     mIOnServiceConnectComplete.onServiceConnectComplete(mService);
                 }
             }
@@ -274,6 +277,8 @@ public class ServiceManager implements IConstants {
         }
     }
 
+
+    //连接完成的回掉处理
     public void setOnServiceConnectComplete(
             IOnServiceConnectComplete IServiceConnect) {
         mIOnServiceConnectComplete = IServiceConnect;

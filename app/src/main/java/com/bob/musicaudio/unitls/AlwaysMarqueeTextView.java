@@ -7,6 +7,7 @@ import android.widget.TextView;
 /**
  * Created by Administrator on 2015/7/12.
  */
+//自定义控件
 public class AlwaysMarqueeTextView extends TextView {
 
     public AlwaysMarqueeTextView(Context context) {

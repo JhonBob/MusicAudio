@@ -13,6 +13,9 @@ import java.util.List;
 /**
  * Created by Administrator on 2015/7/13.
  */
+
+
+//艺术家数据插叙API
 public class ArtistInfoDao {
     private static final String TABLE_ARTIST = "artist_info";
     private Context mContext;
@@ -70,6 +73,7 @@ public class ArtistInfoDao {
         if(cursor.moveToFirst()) {
             count = cursor.getInt(0);
         }
+        cursor.close();
         return count;
     }
 }

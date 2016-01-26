@@ -9,23 +9,21 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bob.musicaudio.Interface.IConstants;
-import com.bob.musicaudio.Interface.IQueryFinished;
 import com.bob.musicaudio.R;
 import com.bob.musicaudio.SQLdatabase.FavoriteInfoDao;
 import com.bob.musicaudio.SQLdatabase.MusicInfoDao;
 import com.bob.musicaudio.model.MusicInfo;
 import com.bob.musicaudio.service.ServiceManager;
 import com.bob.musicaudio.unitls.MusicUtils;
-import com.bob.musicaudio.unitls.StringHelper;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 /**
  * Created by Administrator on 2015/7/23.
  */
+
+//我的音乐适配器
 public class MyAdapter extends BaseAdapter implements IConstants {
     private LayoutInflater mLayoutInflater;
     private ArrayList<MusicInfo> mMusicList;
@@ -34,11 +32,11 @@ public class MyAdapter extends BaseAdapter implements IConstants {
 
 
     private int mPlayState, mCurPlayMusicIndex = -1;
-    //	private IQueryFinished mIQueryFinished;
+
     private FavoriteInfoDao mFavoriteDao;
     private MusicInfoDao mMusicDao;
     private int mFrom;
-
+    //复用缓存对象
     class ViewHolder {
         TextView musicNameTv, artistTv, durationTv;
         ImageView playStateIconIv, favoriteIv;
@@ -58,17 +56,11 @@ public class MyAdapter extends BaseAdapter implements IConstants {
         this.mFrom = from;
     }
 
-    /**
-     * 当数据库中有数据的时候会调用该方法来更新列表
-     *
-     * @param list
-     */
+   // 当数据库中有数据的时候会调用该方法来更新列表
     public void setData(List<MusicInfo> list) {
         mMusicList.clear();
         if (list != null && list.size() > 0) {
             mMusicList.addAll(list);
-            // 为list排序
-            Collections.sort(mMusicList, comparator);
             notifyDataSetChanged();
         }
     }
@@ -89,33 +81,6 @@ public class MyAdapter extends BaseAdapter implements IConstants {
         return mMusicList;
     }
 
-    public void setQueryFinished(IQueryFinished finish) {
-//		mIQueryFinished = finish;
-    }
-
-    Comparator<MusicInfo> comparator = new Comparator<MusicInfo>() {
-
-        char first_l, first_r;
-
-        @Override
-        public int compare(MusicInfo lhs, MusicInfo rhs) {
-            first_l = lhs.musicName.charAt(0);
-            first_r = rhs.musicName.charAt(0);
-            if (StringHelper.checkType(first_l) == StringHelper.CharType.CHINESE) {
-                first_l = StringHelper.getPinyinFirstLetter(first_l);
-            }
-            if (StringHelper.checkType(first_r) == StringHelper.CharType.CHINESE) {
-                first_r = StringHelper.getPinyinFirstLetter(first_r);
-            }
-            if (first_l > first_r) {
-                return 1;
-            } else if (first_l < first_r) {
-                return -1;
-            } else {
-                return 0;
-            }
-        }
-    };
 
     public void setPlayState(int playState, int playIndex) {
         mPlayState = playState;

@@ -8,6 +8,8 @@ import android.os.Message;
 /**
  * Created by Administrator on 2015/7/23.
  */
+
+//功能：音乐播放进度条时间处理类
 public class MusicTimer {
 
     public final static int REFRESH_PROGRESS_EVENT = 0x100;
